@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0D1B2A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CFW Pro">
+<title>CFW Pro — Dashboard</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+:root {
+  --navy:    #0D1B2A;
+  --navy2:   #122233;
+  --steel:   #1E3448;
+  --steel2:  #243d54;
+  --red:     #C41E3A;
+  --red2:    #e02244;
+  --gold:    #B8860B;
+  --gold2:   #d4a017;
+  --white:   #F0F4F8;
+  --muted:   #8da4be;
+  --danger:  #ff4d4d;
+  --warning: #ff8c00;
+  --ok:      #2ecc71;
+  --info:    #3b82f6;
+  --radius:  14px;
+  --card:    rgba(30,52,72,0.7);
+  --blur:    blur(16px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+/* ===== BACKGROUND MESH ===== */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(196,30,58,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 90% 80%, rgba(184,134,11,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(30,52,72,0.5) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ===== LOGIN SCREEN ===== */
+#login-screen {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--navy);
+  padding: 32px;
+  gap: 0;
+}
+#login-screen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(196,30,58,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(184,134,11,0.1) 0%, transparent 60%);
+}
+
+.login-logo {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; margin-bottom: 48px;
+}
+
+.login-logo-mark {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 26px; font-weight: 500;
+  color: white;
+  box-shadow: 0 8px 32px rgba(196,30,58,0.4), 0 2px 8px rgba(0,0,0,0.4);
+  animation: pulse-logo 3s ease-in-out infinite;
+}
+
+@keyframes pulse-logo {
+  0%,100% { box-shadow: 0 8px 32px rgba(196,30,58,0.4), 0 2px 8px rgba(0,0,0,0.4); }
+  50% { box-shadow: 0 8px 48px rgba(196,30,58,0.65), 0 2px 8px rgba(0,0,0,0.4); }
+}
+
+.login-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px; font-weight: 800;
+  letter-spacing: -0.5px;
+  text-align: center;
+  position: relative;
+}
+
+.login-sub {
+  font-size: 14px; color: var(--muted);
+  text-align: center; position: relative;
+  margin-top: -8px;
+}
+
+.login-divider {
+  position: relative;
+  width: 100%; max-width: 320px;
+  display: flex; align-items: center; gap: 16px;
+  margin: 32px 0;
+}
+
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(141,164,190,0.3), transparent);
+}
+
+.login-divider span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+#google-signin-btn {
+  position: relative;
+  width: 100%; max-width: 320px;
+  background: white;
+  color: #1a1a1a;
+  border: none; border-radius: 12px;
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  font-size: 15px; font-weight: 500; font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+#google-signin-btn:active { transform: scale(0.97); }
+#google-signin-btn svg { flex-shrink: 0; }
+
+.login-footer {
+  position: relative;
+  margin-top: 48px;
+  font-size: 11px; color: var(--muted);
+  text-align: center; line-height: 1.6;
+}
+
+/* ===== MAIN APP ===== */
+#app {
+  display: none;
+  flex-direction: column;
+  min-height: 100dvh;
+  position: relative; z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(13,27,42,0.9);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid rgba(141,164,190,0.1);
+  padding: 12px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.header-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.header-logo {
+  display: flex; align-items: center; gap: 8px;
+}
+
+.header-logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; font-weight: 500; color: white;
+}
+
+.header-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px; font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.header-title span { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 4px; }
+
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn-icon {
+  width: 36px; height: 36px;
+  background: var(--card);
+  border: 1px solid rgba(141,164,190,0.15);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--muted);
+  transition: all 0.15s;
+}
+.btn-icon:active { background: var(--steel2); color: white; }
+
+/* Company Filter Pills */
+.company-filter {
+  display: flex; gap: 6px; overflow-x: auto;
+  scrollbar-width: none; -ms-overflow-style: none;
+  padding-bottom: 2px;
+}
+.company-filter::-webkit-scrollbar { display: none; }
+
+.pill {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 12px; font-weight: 500;
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  border: 1px solid rgba(141,164,190,0.2);
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.pill.active { background: var(--red); color: white; border-color: var(--red); }
+.pill.cfw.active { background: var(--red); border-color: var(--red); }
+.pill.ret.active { background: #0ea5e9; border-color: #0ea5e9; }
+.pill.pes.active { background: var(--gold); border-color: var(--gold); color: #111; }
+
+/* ===== TAB CONTENT ===== */
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  padding-bottom: 90px;
+  display: none;
+}
+.tab-content.active { display: block; }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(13,27,42,0.95);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-top: 1px solid rgba(141,164,190,0.1);
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 50;
+}
+
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px; padding: 10px 4px;
+  cursor: pointer; color: var(--muted);
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-item.active { color: var(--red); }
+.nav-item.active::before {
+  content: '';
+  position: absolute; top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 2px;
+  background: var(--red);
+  border-radius: 0 0 4px 4px;
+}
+.nav-item svg { width: 22px; height: 22px; }
+.nav-label { font-size: 10px; font-family: 'DM Mono', monospace; letter-spacing: 0.3px; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  backdrop-filter: var(--blur);
+  border: 1px solid rgba(141,164,190,0.1);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.card-label {
+  font-size: 11px; color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px; font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.card-value.positive { color: var(--ok); }
+.card-value.negative { color: var(--danger); }
+.card-value.neutral { color: var(--white); }
+
+.card-delta {
+  font-size: 12px; margin-top: 4px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.kpi-grid .card { margin-bottom: 0; }
+.kpi-grid .card.full { grid-column: 1/-1; }
+
+/* ===== SECTION TITLE ===== */
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(141,164,190,0.15);
+}
+
+/* ===== PENDING ITEMS ===== */
+.pending-item {
+  background: var(--card);
+  border: 1px solid rgba(141,164,190,0.1);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 8px;
+  display: flex; gap: 12px; align-items: flex-start;
+  animation: slide-in 0.3s ease both;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pending-badge {
+  flex-shrink: 0;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+.badge-overdue { background: var(--danger); box-shadow: 0 0 8px rgba(255,77,77,0.6); }
+.badge-today   { background: #ff8c00;    box-shadow: 0 0 8px rgba(255,140,0,0.6); }
+.badge-week    { background: var(--gold2); }
+.badge-month   { background: var(--info); }
+.badge-future  { background: var(--muted); }
+
+.pending-content { flex: 1; min-width: 0; }
+.pending-id {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 0.5px;
+}
+.pending-desc {
+  font-size: 13px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin: 2px 0;
+}
+.pending-meta {
+  font-size: 11px; color: var(--muted);
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+
+.pending-right { text-align: right; flex-shrink: 0; }
+.pending-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 700;
+}
+.pending-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; margin-top: 3px;
+}
+.date-overdue { color: var(--danger); }
+.date-today   { color: #ff8c00; }
+.date-week    { color: var(--gold2); }
+.date-month   { color: var(--info); }
+
+.company-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 9px; font-family: 'DM Mono', monospace;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.tag-cfw { background: rgba(196,30,58,0.25); color: #ff6b8a; }
+.tag-ret { background: rgba(14,165,233,0.2); color: #7dd3fc; }
+.tag-pes { background: rgba(184,134,11,0.2); color: var(--gold2); }
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  display: flex; gap: 8px; margin-bottom: 12px;
+  align-items: center; flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1; min-width: 160px;
+  background: var(--steel);
+  border: 1px solid rgba(141,164,190,0.15);
+  border-radius: 10px;
+  padding: 9px 14px;
+  color: var(--white);
+  font-size: 14px; font-family: 'Inter', sans-serif;
+  outline: none;
+}
+.search-box:focus { border-color: rgba(196,30,58,0.5); }
+.search-box::placeholder { color: var(--muted); }
+
+.filter-select {
+  background: var(--steel);
+  border: 1px solid rgba(141,164,190,0.15);
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: var(--white);
+  font-size: 12px; font-family: 'DM Mono', monospace;
+  outline: none; cursor: pointer;
+  appearance: none;
+}
+
+/* ===== TABLE ===== */
+.table-scroll {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid rgba(141,164,190,0.1);
+}
+
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px;
+}
+
+thead th {
+  background: var(--steel);
+  padding: 10px 12px;
+  text-align: left;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--muted);
+  white-space: nowrap;
+  position: sticky; top: 0;
+}
+
+tbody tr {
+  border-bottom: 1px solid rgba(141,164,190,0.06);
+  transition: background 0.15s;
+}
+tbody tr:hover { background: rgba(30,52,72,0.5); }
+
+tbody td {
+  padding: 10px 12px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+td.desc-cell {
+  max-width: 180px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 2px 8px; border-radius: 6px;
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  letter-spacing: 0.3px;
+}
+.chip-pago { background: rgba(46,204,113,0.2); color: #2ecc71; }
+.chip-pendente { background: rgba(255,140,0,0.2); color: #ff8c00; }
+
+.tipo-chip {
+  display: inline-block;
+  padding: 2px 8px; border-radius: 6px;
+  font-size: 10px; font-family: 'DM Mono', monospace;
+}
+.chip-entrada { background: rgba(46,204,113,0.15); color: #2ecc71; }
+.chip-saida { background: rgba(196,30,58,0.15); color: #ff6b8a; }
+
+/* ===== CHARTS ===== */
+.chart-card {
+  background: var(--card);
+  border: 1px solid rgba(141,164,190,0.1);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.chart-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 4px;
+}
+.chart-sub { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+.chart-wrap { position: relative; height: 200px; }
+
+/* ===== PREVISÃO ===== */
+.forecast-bar {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.forecast-month {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--muted);
+  width: 52px; flex-shrink: 0;
+}
+.forecast-track {
+  flex: 1; height: 8px;
+  background: rgba(141,164,190,0.1);
+  border-radius: 4px; overflow: hidden;
+}
+.forecast-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(to right, var(--red), var(--gold));
+  transition: width 0.6s ease;
+}
+.forecast-amount {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 600;
+  text-align: right; width: 90px; flex-shrink: 0;
+}
+
+/* ===== LOADING ===== */
+.loading-ring {
+  display: flex; justify-content: center; align-items: center;
+  padding: 48px;
+}
+.ring {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(141,164,190,0.2);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center; padding: 48px 24px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; line-height: 1.6; }
+
+/* ===== TOAST ===== */
+#toast {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--steel2);
+  border: 1px solid rgba(141,164,190,0.2);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13px;
+  z-index: 200;
+  opacity: 0; transition: opacity 0.3s;
+  white-space: nowrap;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; }
+
+/* ===== REFRESH INDICATOR ===== */
+.last-update {
+  font-size: 10px; color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  text-align: center;
+  padding: 4px 0 2px;
+}
+
+/* ===== SUMMARY SECTION (home) ===== */
+.balance-hero {
+  background: linear-gradient(135deg, rgba(196,30,58,0.2), rgba(184,134,11,0.1));
+  border: 1px solid rgba(196,30,58,0.25);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  position: relative; overflow: hidden;
+}
+.balance-hero::before {
+  content: '';
+  position: absolute; right: -20px; top: -20px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(196,30,58,0.15), transparent);
+  border-radius: 50%;
+}
+.balance-label {
+  font-size: 11px; color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.balance-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px; font-weight: 800;
+  letter-spacing: -1px;
+}
+.balance-sub {
+  font-size: 12px; color: var(--muted);
+  margin-top: 4px; font-family: 'DM Mono', monospace;
+}
+
+/* Company breakdown mini */
+.company-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(141,164,190,0.08);
+}
+.company-row:last-child { border-bottom: none; }
+.company-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.company-name { flex: 1; font-size: 13px; }
+.company-saldo {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 480px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-logo">
+    <div class="login-logo-mark">CFW</div>
+    <div>
+      <div class="login-title">CFW Pro</div>
+      <div class="login-sub">Dashboard Financeiro</div>
+    </div>
+  </div>
+
+  <div class="login-divider">
+    <span>Faça login para continuar</span>
+  </div>
+
+  <button id="google-signin-btn" onclick="signIn()">
+    <svg width="20" height="20" viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    </svg>
+    Entrar com Google
+  </button>
+
+  <div class="login-footer">
+    Acesso restrito • Dados reais do CFW Pro<br>
+    Apenas usuários autorizados
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MAIN APP -->
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-logo">
+        <div class="header-logo-mark">CFW</div>
+        <div class="header-title">CFW Pro <span id="header-date"></span></div>
+      </div>
+      <div class="header-actions">
+        <div class="btn-icon" onclick="refreshData()" title="Atualizar">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+          </svg>
+        </div>
+        <div class="btn-icon" onclick="signOut()" title="Sair">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="company-filter">
+      <button class="pill active" data-company="all" onclick="setCompany('all', this)">Todas</button>
+      <button class="pill cfw" data-company="cfw" onclick="setCompany('cfw', this)">CFW Brasil</button>
+      <button class="pill ret" data-company="ret" onclick="setCompany('ret', this)">Retiparts</button>
+      <button class="pill pes" data-company="pes" onclick="setCompany('pes', this)">Pessoal</button>
+    </div>
+    <div class="last-update" id="last-update">—</div>
+  </header>
+
+  <!-- TAB: RESUMO -->
+  <div class="tab-content active" id="tab-resumo">
+    <div id="resumo-content">
+      <div class="loading-ring"><div class="ring"></div></div>
+    </div>
+  </div>
+
+  <!-- TAB: PENDÊNCIAS -->
+  <div class="tab-content" id="tab-pendencias">
+    <div class="filter-bar">
+      <input class="search-box" type="search" placeholder="Buscar lançamento..." id="pend-search" oninput="renderPendencias()">
+      <select class="filter-select" id="pend-status" onchange="renderPendencias()">
+        <option value="all">Todos</option>
+        <option value="overdue">Vencidos</option>
+        <option value="today">Hoje</option>
+        <option value="week">7 dias</option>
+        <option value="month">30 dias</option>
+      </select>
+    </div>
+    <div id="pendencias-content">
+      <div class="loading-ring"><div class="ring"></div></div>
+    </div>
+  </div>
+
+  <!-- TAB: LANÇAMENTOS -->
+  <div class="tab-content" id="tab-lancamentos">
+    <div class="filter-bar">
+      <input class="search-box" type="search" placeholder="Buscar..." id="lanc-search" oninput="renderLancamentos()">
+      <select class="filter-select" id="lanc-tipo" onchange="renderLancamentos()">
+        <option value="all">Tipo</option>
+        <option value="Entrada">Entrada</option>
+        <option value="Saída">Saída</option>
+      </select>
+      <select class="filter-select" id="lanc-status" onchange="renderLancamentos()">
+        <option value="all">Status</option>
+        <option value="Pago">Pago</option>
+        <option value="Pendente">Pendente</option>
+      </select>
+    </div>
+    <div id="lancamentos-content">
+      <div class="loading-ring"><div class="ring"></div></div>
+    </div>
+  </div>
+
+  <!-- TAB: GRÁFICOS -->
+  <div class="tab-content" id="tab-graficos">
+    <div id="graficos-content">
+      <div class="loading-ring"><div class="ring"></div></div>
+    </div>
+  </div>
+
+  <!-- TAB: PREVISÃO -->
+  <div class="tab-content" id="tab-previsao">
+    <div id="previsao-content">
+      <div class="loading-ring"><div class="ring"></div></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('resumo', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <span class="nav-label">Resumo</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('pendencias', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span class="nav-label">Alertas</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('lancamentos', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+        <line x1="8" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+      </svg>
+      <span class="nav-label">Lançamentos</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('graficos', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span class="nav-label">Gráficos</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('previsao', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M2 12h20M12 2l8 8-8 8"/>
+      </svg>
+      <span class="nav-label">Previsão</span>
+    </div>
+  </nav>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const CONFIG = {
+  CLIENT_ID: '632230656785-q918b8gicmvodaci54cd50ro350s0ekl.apps.googleusercontent.com',
+  SHEET_ID: '1hMRRvUvsIeDX-4Rb1PvNwDL_IC83Qf6wpP7_h7t-vwE',
+  SCOPES: 'https://www.googleapis.com/auth/spreadsheets.readonly profile email',
+  SHEETS: {
+    cfw: "CFW - Lanç.",
+    ret: "Retiparts - Lanç.",
+    pes: "Pessoal - Lanç."
+  },
+  // Column indices
+  COL: { ID:0, DATA_LANC:1, DATA_VENC:2, DESC:3, CAT:4, SUBCAT:5, TIPO:6, CLIENTE:7, VALOR:8, FORMA:9, BANCO:10, STATUS:11, DATA_PAG:12 }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  token: null,
+  user: null,
+  data: { cfw: [], ret: [], pes: [] },
+  company: 'all',
+  activeTab: 'resumo',
+  charts: {},
+  loading: false
+};
+
+// ============================================================
+// AUTH — Google Identity Services (GIS)
+// ============================================================
+function signIn() {
+  google.accounts.oauth2.initTokenClient({
+    client_id: CONFIG.CLIENT_ID,
+    scope: CONFIG.SCOPES,
+    prompt: 'consent',
+    callback: function(resp) {
+      if (resp.error) { showToast('Erro: ' + resp.error); return; }
+      state.token = resp.access_token;
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: 'Bearer ' + state.token }
+      }).then(r => r.json()).then(u => {
+        state.user = u;
+        startApp();
+      }).catch(() => startApp());
+    }
+  }).requestAccessToken();
+}
+
+function reGrantSheets() { signIn(); }
+
+function signOut() {
+  if (state.token) google.accounts.oauth2.revoke(state.token, () => {});
+  state.token = null; state.user = null;
+  state.data = { cfw: [], ret: [], pes: [] };
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+function startApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  var now = new Date();
+  document.getElementById('header-date').textContent =
+    now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  loadAllData();
+}
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadAllData() {
+  if (state.loading) return;
+  state.loading = true;
+  showToast('Atualizando dados...');
+
+  try {
+    const [cfw, ret, pes] = await Promise.all([
+      fetchSheet(CONFIG.SHEETS.cfw),
+      fetchSheet(CONFIG.SHEETS.ret),
+      fetchSheet(CONFIG.SHEETS.pes)
+    ]);
+    state.data.cfw = parseSheet(cfw, 'CFW');
+    state.data.ret = parseSheet(ret, 'RET');
+    state.data.pes = parseSheet(pes, 'PES');
+
+    const now = new Date();
+    document.getElementById('last-update').textContent =
+      'Atualizado às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    renderCurrentTab();
+    showToast('✓ Dados atualizados');
+  } catch(e) {
+    console.error(e);
+    if (e.message === 'NEEDS_SHEETS_SCOPE') {
+      document.getElementById('resumo-content').innerHTML = `
+        <div class="card" style="text-align:center;padding:32px">
+          <div style="font-size:36px;margin-bottom:12px">🔐</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">Permissão necessária</div>
+          <div style="color:var(--muted);font-size:13px;margin-bottom:20px">O dashboard precisa de acesso ao Google Sheets para ler seus lançamentos.</div>
+          <button onclick="reGrantSheets()" style="background:var(--red);color:white;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:600;cursor:pointer">
+            Conceder acesso ao Sheets
+          </button>
+        </div>`;
+      showToast('Precisamos de permissão para ler o Google Sheets');
+    } else {
+      showToast('Erro ao carregar: ' + e.message);
+    }
+  } finally {
+    state.loading = false;
+  }
+}
+
+async function fetchSheet(sheetName) {
+  var range = encodeURIComponent(sheetName + '!A:P');
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/' + range;
+  var res = await fetch(url, { headers: { Authorization: 'Bearer ' + state.token } });
+  if (res.status === 403 || res.status === 401) throw new Error('NEEDS_SHEETS_SCOPE');
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + sheetName);
+  var json = await res.json();
+  return json.values || [];
+}
+
+function parseSheet(rows, empresa) {
+  if (!rows.length) return [];
+  const header = rows[0]; // skip header row
+  return rows.slice(1).filter(r => r[CONFIG.COL.ID]).map(r => ({
+    id:         r[CONFIG.COL.ID] || '',
+    dataLanc:   r[CONFIG.COL.DATA_LANC] || '',
+    dataVenc:   r[CONFIG.COL.DATA_VENC] || '',
+    desc:       r[CONFIG.COL.DESC] || '',
+    cat:        r[CONFIG.COL.CAT] || '',
+    subcat:     r[CONFIG.COL.SUBCAT] || '',
+    tipo:       r[CONFIG.COL.TIPO] || '',
+    cliente:    r[CONFIG.COL.CLIENTE] || '',
+    valor:      parseVal(r[CONFIG.COL.VALOR]),
+    forma:      r[CONFIG.COL.FORMA] || '',
+    banco:      r[CONFIG.COL.BANCO] || '',
+    status:     r[CONFIG.COL.STATUS] || '',
+    dataPag:    r[12] || '',
+    empresa
+  }));
+}
+
+function parseVal(v) {
+  if (!v) return 0;
+  return parseFloat(String(v).replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.')) || 0;
+}
+
+function parseDate(s) {
+  if (!s) return null;
+  const p = s.split('/');
+  if (p.length !== 3) return null;
+  return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
+}
+
+function fmtVal(v) {
+  return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  const p = s.split('/');
+  return p[0] + '/' + p[1];
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  el.classList.add('active');
+  state.activeTab = tab;
+  renderCurrentTab();
+}
+
+function setCompany(c, el) {
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  state.company = c;
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  if (state.data.cfw.length === 0 && state.data.ret.length === 0 && state.data.pes.length === 0) return;
+  const tab = state.activeTab;
+  if (tab === 'resumo')      renderResumo();
+  if (tab === 'pendencias')  renderPendencias();
+  if (tab === 'lancamentos') renderLancamentos();
+  if (tab === 'graficos')    renderGraficos();
+  if (tab === 'previsao')    renderPrevisao();
+}
+
+function getActiveData() {
+  const c = state.company;
+  if (c === 'all') return [...state.data.cfw, ...state.data.ret, ...state.data.pes];
+  return state.data[c] || [];
+}
+
+// ============================================================
+// RESUMO
+// ============================================================
+function renderResumo() {
+  const now = new Date();
+  const mes = now.getMonth(); const ano = now.getFullYear();
+
+  function monthStats(rows) {
+    const thisMonth = rows.filter(r => {
+      const d = parseDate(r.dataLanc);
+      return d && d.getMonth() === mes && d.getFullYear() === ano;
+    });
+    const entradas = thisMonth.filter(r => r.tipo === 'Entrada').reduce((s,r) => s+r.valor, 0);
+    const saidas   = thisMonth.filter(r => r.tipo === 'Saída').reduce((s,r) => s+r.valor, 0);
+    const pendente = rows.filter(r => r.status === 'Pendente').reduce((s,r) => s+r.valor, 0);
+    const vencidos = rows.filter(r => {
+      if (r.status !== 'Pendente') return false;
+      const d = parseDate(r.dataVenc); return d && d < now;
+    }).length;
+    return { entradas, saidas, saldo: entradas-saidas, pendente, vencidos, total: thisMonth.length };
+  }
+
+  const cfwS = monthStats(state.data.cfw);
+  const retS = monthStats(state.data.ret);
+  const pesS = monthStats(state.data.pes);
+
+  const data = state.company === 'all'
+    ? { entradas: cfwS.entradas+retS.entradas+pesS.entradas,
+        saidas:   cfwS.saidas+retS.saidas+pesS.saidas,
+        saldo:    cfwS.saldo+retS.saldo+pesS.saldo,
+        pendente: cfwS.pendente+retS.pendente+pesS.pendente,
+        vencidos: cfwS.vencidos+retS.vencidos+pesS.vencidos }
+    : monthStats(state.data[state.company]);
+
+  const mesNome = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+  // Quick pending list (today + overdue)
+  const allData = getActiveData();
+  const alertas = allData.filter(r => {
+    if (r.status !== 'Pendente') return false;
+    const d = parseDate(r.dataVenc);
+    if (!d) return false;
+    const diff = (d - now) / 86400000;
+    return diff <= 7;
+  }).sort((a,b) => parseDate(a.dataVenc) - parseDate(b.dataVenc)).slice(0, 5);
+
+  document.getElementById('resumo-content').innerHTML = `
+    <div class="balance-hero">
+      <div class="balance-label">Saldo do mês · ${mesNome}</div>
+      <div class="balance-value ${data.saldo >= 0 ? 'positive' : 'negative'}" style="color:${data.saldo >= 0 ? 'var(--ok)' : 'var(--danger)'}">
+        ${fmtVal(data.saldo)}
+      </div>
+      <div class="balance-sub">${data.saldo >= 0 ? '▲' : '▼'} saldo líquido no período</div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card">
+        <div class="card-label">Entradas</div>
+        <div class="card-value" style="font-size:20px;color:var(--ok)">${fmtVal(data.entradas)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Saídas</div>
+        <div class="card-value" style="font-size:20px;color:var(--danger)">${fmtVal(data.saidas)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Pendente</div>
+        <div class="card-value" style="font-size:18px;color:var(--warning)">${fmtVal(data.pendente)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Vencidos</div>
+        <div class="card-value" style="font-size:28px;color:${data.vencidos>0?'var(--danger)':'var(--ok)'}">${data.vencidos}</div>
+      </div>
+    </div>
+
+    ${state.company === 'all' ? `
+    <div class="card">
+      <div class="card-label">Por empresa · mês atual</div>
+      <div class="company-row">
+        <div class="company-dot" style="background:var(--red)"></div>
+        <div class="company-name">CFW Brasil</div>
+        <div class="company-saldo" style="color:${cfwS.saldo>=0?'var(--ok)':'var(--danger)'}">${fmtVal(cfwS.saldo)}</div>
+      </div>
+      <div class="company-row">
+        <div class="company-dot" style="background:#0ea5e9"></div>
+        <div class="company-name">Retiparts</div>
+        <div class="company-saldo" style="color:${retS.saldo>=0?'var(--ok)':'var(--danger)'}">${fmtVal(retS.saldo)}</div>
+      </div>
+      <div class="company-row">
+        <div class="company-dot" style="background:var(--gold)"></div>
+        <div class="company-name">Pessoal</div>
+        <div class="company-saldo" style="color:${pesS.saldo>=0?'var(--ok)':'var(--danger)'}">${fmtVal(pesS.saldo)}</div>
+      </div>
+    </div>` : ''}
+
+    ${alertas.length ? `
+    <div class="section-title">Alertas urgentes</div>
+    ${alertas.map(r => pendingItemHTML(r)).join('')}
+    ` : ''}
+  `;
+}
+
+// ============================================================
+// PENDÊNCIAS
+// ============================================================
+function getDaysClass(d) {
+  if (!d) return { cls: 'future', dateCls: '' };
+  const now = new Date(); now.setHours(0,0,0,0);
+  const diff = Math.round((d - now) / 86400000);
+  if (diff < 0)  return { cls: 'overdue', dateCls: 'date-overdue' };
+  if (diff === 0) return { cls: 'today',  dateCls: 'date-today' };
+  if (diff <= 7)  return { cls: 'week',   dateCls: 'date-week' };
+  if (diff <= 30) return { cls: 'month',  dateCls: 'date-month' };
+  return { cls: 'future', dateCls: '' };
+}
+
+function pendingItemHTML(r) {
+  const d = parseDate(r.dataVenc);
+  const { cls, dateCls } = getDaysClass(d);
+  const tag = r.empresa === 'CFW' ? 'tag-cfw' : r.empresa === 'RET' ? 'tag-ret' : 'tag-pes';
+  const tagLabel = r.empresa === 'CFW' ? 'CFW' : r.empresa === 'RET' ? 'RET' : 'PES';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const diff = d ? Math.round((d - now) / 86400000) : 999;
+  const diffLabel = diff < 0 ? `${Math.abs(diff)}d atraso` : diff === 0 ? 'HOJE' : `${diff}d`;
+  const valorColor = r.tipo === 'Entrada' ? 'var(--ok)' : 'var(--danger)';
+
+  return `
+  <div class="pending-item">
+    <div class="pending-badge badge-${cls}"></div>
+    <div class="pending-content">
+      <div class="pending-id">${r.id} · <span class="company-tag ${tag}">${tagLabel}</span></div>
+      <div class="pending-desc" title="${r.desc}">${r.desc}</div>
+      <div class="pending-meta">
+        <span>${r.cliente || '—'}</span>
+        ${r.forma ? `<span>· ${r.forma}</span>` : ''}
+      </div>
+    </div>
+    <div class="pending-right">
+      <div class="pending-value" style="color:${valorColor}">${fmtVal(r.valor)}</div>
+      <div class="pending-date ${dateCls}">${fmtDate(r.dataVenc)} · ${diffLabel}</div>
+    </div>
+  </div>`;
+}
+
+function renderPendencias() {
+  const allData = getActiveData();
+  const search = (document.getElementById('pend-search')?.value || '').toLowerCase();
+  const statusFilter = document.getElementById('pend-status')?.value || 'all';
+  const now = new Date(); now.setHours(0,0,0,0);
+
+  let items = allData.filter(r => r.status === 'Pendente');
+
+  // Status filter
+  if (statusFilter !== 'all') {
+    items = items.filter(r => {
+      const d = parseDate(r.dataVenc);
+      if (!d) return false;
+      const diff = Math.round((d - now) / 86400000);
+      if (statusFilter === 'overdue') return diff < 0;
+      if (statusFilter === 'today')   return diff === 0;
+      if (statusFilter === 'week')    return diff >= 0 && diff <= 7;
+      if (statusFilter === 'month')   return diff >= 0 && diff <= 30;
+      return true;
+    });
+  }
+
+  // Search filter
+  if (search) {
+    items = items.filter(r =>
+      r.desc.toLowerCase().includes(search) ||
+      r.id.toLowerCase().includes(search) ||
+      r.cliente.toLowerCase().includes(search)
+    );
+  }
+
+  // Sort by date
+  items.sort((a,b) => {
+    const da = parseDate(a.dataVenc), db = parseDate(b.dataVenc);
+    if (!da && !db) return 0;
+    if (!da) return 1; if (!db) return -1;
+    return da - db;
+  });
+
+  const total = fmtVal(items.reduce((s,r) => s+r.valor, 0));
+  const overdue = items.filter(r => { const d=parseDate(r.dataVenc); return d && d < now; }).length;
+
+  document.getElementById('pendencias-content').innerHTML = items.length === 0
+    ? `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">Nenhuma pendência encontrada</div></div>`
+    : `
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="card-label">Total pendente</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--warning)">${total}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="card-label">Itens</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700">${items.length}</div>
+          </div>
+          ${overdue > 0 ? `<div style="text-align:right">
+            <div class="card-label">Vencidos</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--danger)">${overdue}</div>
+          </div>` : ''}
+        </div>
+      </div>
+      ${items.map(r => pendingItemHTML(r)).join('')}
+    `;
+}
+
+// ============================================================
+// LANÇAMENTOS
+// ============================================================
+function renderLancamentos() {
+  const allData = getActiveData();
+  const search = (document.getElementById('lanc-search')?.value || '').toLowerCase();
+  const tipo   = document.getElementById('lanc-tipo')?.value || 'all';
+  const status = document.getElementById('lanc-status')?.value || 'all';
+
+  let items = [...allData];
+  if (tipo !== 'all')   items = items.filter(r => r.tipo === tipo);
+  if (status !== 'all') items = items.filter(r => r.status === status);
+  if (search) items = items.filter(r =>
+    r.desc.toLowerCase().includes(search) ||
+    r.id.toLowerCase().includes(search) ||
+    r.cliente.toLowerCase().includes(search) ||
+    r.cat.toLowerCase().includes(search)
+  );
+
+  // Sort by launch date desc
+  items.sort((a,b) => {
+    const da = parseDate(a.dataLanc), db = parseDate(b.dataLanc);
+    if (!da && !db) return 0; if (!da) return 1; if (!db) return -1;
+    return db - da;
+  });
+
+  if (!items.length) {
+    document.getElementById('lancamentos-content').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Nenhum lançamento encontrado</div></div>';
+    return;
+  }
+
+  const rows = items.map(r => {
+    const tag = r.empresa === 'CFW' ? 'tag-cfw' : r.empresa === 'RET' ? 'tag-ret' : 'tag-pes';
+    const tagLabel = r.empresa === 'CFW' ? 'CFW' : r.empresa === 'RET' ? 'RET' : 'PES';
+    const valorColor = r.tipo === 'Entrada' ? 'var(--ok)' : 'var(--danger)';
+    return `<tr>
+      <td><span class="company-tag ${tag}">${tagLabel}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${r.id}</td>
+      <td class="desc-cell" title="${r.desc}">${r.desc}</td>
+      <td style="font-family:'Syne',sans-serif;font-weight:700;color:${valorColor}">${fmtVal(r.valor)}</td>
+      <td><span class="tipo-chip ${r.tipo==='Entrada'?'chip-entrada':'chip-saida'}">${r.tipo}</span></td>
+      <td><span class="status-chip ${r.status==='Pago'?'chip-pago':'chip-pendente'}">${r.status}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${fmtDate(r.dataVenc)}</td>
+      <td style="font-size:11px;color:var(--muted);max-width:80px;overflow:hidden;text-overflow:ellipsis">${r.cliente}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('lancamentos-content').innerHTML = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-family:'DM Mono',monospace">${items.length} lançamentos</div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Emp.</th><th>ID</th><th>Descrição</th>
+            <th>Valor</th><th>Tipo</th><th>Status</th>
+            <th>Venc.</th><th>Cliente</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+// ============================================================
+// GRÁFICOS
+// ============================================================
+function renderGraficos() {
+  const allData = getActiveData();
+  const now = new Date();
+
+  // Last 6 months cashflow
+  const months = [];
+  for (let i=5; i>=0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    months.push({
+      label: d.toLocaleDateString('pt-BR', { month: 'short' }),
+      month: d.getMonth(), year: d.getFullYear()
+    });
+  }
+
+  const cashflow = months.map(m => {
+    const rows = allData.filter(r => {
+      const d = parseDate(r.dataLanc);
+      return d && d.getMonth() === m.month && d.getFullYear() === m.year;
+    });
+    return {
+      label: m.label,
+      entradas: rows.filter(r => r.tipo === 'Entrada').reduce((s,r) => s+r.valor, 0),
+      saidas:   rows.filter(r => r.tipo === 'Saída').reduce((s,r) => s+r.valor, 0)
+    };
+  });
+
+  // Category breakdown (current month)
+  const thisMon = allData.filter(r => {
+    const d = parseDate(r.dataLanc);
+    return d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  const catMap = {};
+  thisMon.filter(r => r.tipo === 'Saída').forEach(r => {
+    catMap[r.cat] = (catMap[r.cat] || 0) + r.valor;
+  });
+  const cats = Object.entries(catMap).sort((a,b) => b[1]-a[1]).slice(0, 6);
+
+  // Status distribution
+  const totalPago     = allData.filter(r => r.status === 'Pago').length;
+  const totalPendente = allData.filter(r => r.status === 'Pendente').length;
+
+  document.getElementById('graficos-content').innerHTML = `
+    <div class="chart-card">
+      <div class="chart-title">Fluxo de Caixa</div>
+      <div class="chart-sub">Entradas vs Saídas — últimos 6 meses</div>
+      <div class="chart-wrap"><canvas id="chart-cashflow"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Saídas por Categoria</div>
+      <div class="chart-sub">Distribuição do mês atual</div>
+      <div class="chart-wrap"><canvas id="chart-cat"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Status dos Lançamentos</div>
+      <div class="chart-sub">Pago vs Pendente · total acumulado</div>
+      <div class="chart-wrap" style="height:160px"><canvas id="chart-status"></canvas></div>
+    </div>
+  `;
+
+  // Destroy old charts
+  Object.values(state.charts).forEach(c => c.destroy());
+  state.charts = {};
+
+  const chartDefaults = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#8da4be', font: { family: 'DM Mono', size: 11 } } } },
+    scales: {
+      x: { ticks: { color: '#8da4be', font: { family: 'DM Mono', size: 10 } }, grid: { color: 'rgba(141,164,190,0.06)' } },
+      y: { ticks: { color: '#8da4be', font: { family: 'DM Mono', size: 10 }, callback: v => 'R$' + (v/1000).toFixed(0)+'k' }, grid: { color: 'rgba(141,164,190,0.06)' } }
+    }
+  };
+
+  // Cashflow chart
+  state.charts.cashflow = new Chart(document.getElementById('chart-cashflow'), {
+    type: 'bar',
+    data: {
+      labels: cashflow.map(m => m.label),
+      datasets: [
+        { label: 'Entradas', data: cashflow.map(m => m.entradas), backgroundColor: 'rgba(46,204,113,0.7)', borderRadius: 4 },
+        { label: 'Saídas',   data: cashflow.map(m => m.saidas),   backgroundColor: 'rgba(196,30,58,0.7)',  borderRadius: 4 }
+      ]
+    },
+    options: { ...chartDefaults }
+  });
+
+  // Category chart
+  if (cats.length) {
+    state.charts.cat = new Chart(document.getElementById('chart-cat'), {
+      type: 'doughnut',
+      data: {
+        labels: cats.map(c => c[0]),
+        datasets: [{ data: cats.map(c => c[1]),
+          backgroundColor: ['#C41E3A','#B8860B','#0ea5e9','#8b5cf6','#ec4899','#14b8a6'],
+          borderWidth: 0, hoverOffset: 6 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { color: '#8da4be', font: { family: 'DM Mono', size: 10 }, boxWidth: 10 } }
+        }
+      }
+    });
+  }
+
+  // Status chart
+  state.charts.status = new Chart(document.getElementById('chart-status'), {
+    type: 'bar',
+    data: {
+      labels: ['Pago', 'Pendente'],
+      datasets: [{ data: [totalPago, totalPendente],
+        backgroundColor: ['rgba(46,204,113,0.7)', 'rgba(255,140,0,0.7)'],
+        borderRadius: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#8da4be', font: { family: 'DM Mono', size: 11 } }, grid: { display: false } },
+        y: { ticks: { color: '#8da4be', font: { family: 'DM Mono', size: 10 } }, grid: { color: 'rgba(141,164,190,0.06)' } }
+      },
+      indexAxis: 'y'
+    }
+  });
+}
+
+// ============================================================
+// PREVISÃO
+// ============================================================
+function renderPrevisao() {
+  const allData = getActiveData();
+  const now = new Date(); now.setHours(0,0,0,0);
+
+  // Group pending items by month (next 6 months)
+  const months = [];
+  for (let i=0; i<6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    months.push({ label: d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }), month: d.getMonth(), year: d.getFullYear() });
+  }
+
+  const pending = allData.filter(r => r.status === 'Pendente');
+
+  const forecast = months.map(m => {
+    const items = pending.filter(r => {
+      const d = parseDate(r.dataVenc);
+      return d && d.getMonth() === m.month && d.getFullYear() === m.year;
+    });
+    const saidas   = items.filter(r => r.tipo === 'Saída').reduce((s,r) => s+r.valor, 0);
+    const entradas = items.filter(r => r.tipo === 'Entrada').reduce((s,r) => s+r.valor, 0);
+    return { ...m, saidas, entradas, total: entradas - saidas, count: items.length };
+  });
+
+  const maxSaida = Math.max(...forecast.map(f => f.saidas), 1);
+  const maxEntrada = Math.max(...forecast.map(f => f.entradas), 1);
+
+  // Overdue
+  const overdue = pending.filter(r => {
+    const d = parseDate(r.dataVenc); return d && d < now;
+  }).sort((a,b) => parseDate(a.dataVenc)-parseDate(b.dataVenc));
+
+  const totalSaidas   = forecast.reduce((s,f) => s+f.saidas, 0);
+  const totalEntradas = forecast.reduce((s,f) => s+f.entradas, 0);
+
+  document.getElementById('previsao-content').innerHTML = `
+    <div class="kpi-grid">
+      <div class="card">
+        <div class="card-label">Entradas prev.</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--ok)">${fmtVal(totalEntradas)}</div>
+        <div class="card-delta">próx. 6 meses</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Saídas prev.</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--danger)">${fmtVal(totalSaidas)}</div>
+        <div class="card-delta">próx. 6 meses</div>
+      </div>
+    </div>
+
+    <div class="section-title">Saídas por mês</div>
+    <div class="card">
+      ${forecast.map(f => `
+        <div class="forecast-bar">
+          <div class="forecast-month">${f.label.split(' ')[0].toUpperCase().slice(0,3)}</div>
+          <div class="forecast-track">
+            <div class="forecast-fill" style="width:${f.saidas/maxSaida*100}%;background:linear-gradient(to right,var(--red),rgba(196,30,58,0.5))"></div>
+          </div>
+          <div class="forecast-amount" style="color:var(--danger)">${fmtVal(f.saidas)}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="section-title">Entradas por mês</div>
+    <div class="card">
+      ${forecast.map(f => `
+        <div class="forecast-bar">
+          <div class="forecast-month">${f.label.split(' ')[0].toUpperCase().slice(0,3)}</div>
+          <div class="forecast-track">
+            <div class="forecast-fill" style="width:${f.entradas/maxEntrada*100}%;background:linear-gradient(to right,var(--ok),rgba(46,204,113,0.5))"></div>
+          </div>
+          <div class="forecast-amount" style="color:var(--ok)">${fmtVal(f.entradas)}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    ${overdue.length ? `
+    <div class="section-title" style="color:var(--danger)">⚠️ Em atraso</div>
+    ${overdue.map(r => pendingItemHTML(r)).join('')}
+    ` : `<div class="card" style="text-align:center;color:var(--ok);padding:20px">
+      <div style="font-size:28px">✓</div>
+      <div style="margin-top:8px;font-size:14px">Nenhum item em atraso</div>
+    </div>`}
+  `;
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function refreshData() {
+  loadAllData();
+}
+
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// Service worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
